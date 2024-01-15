@@ -1,0 +1,1 @@
+git filter-branch --force --index-filter  'git rm --cached --ignore-unmatch sources/TorchPruner/bert_related/fine_tuned_bert_hf_lib'  --prune-empty --tag-name-filter cat -- --all
