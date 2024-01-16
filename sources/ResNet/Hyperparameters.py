@@ -21,7 +21,7 @@ def get_hp_formal_cifar10():
     hp = Hyperparameters()
     hp.data_size_train = 50000
     hp.data_size_test = 10000
-    hp.num_epochs = 20
+    hp.num_epochs = 10
     hp.batch_size = 128
     hp.learning_rate = 0.01
     hp.num_classes = 10
