@@ -8,10 +8,9 @@ def create_csv_file(file_name, variable_names):
 
 
 def save_to_file(input_data, output_data, file_path):
-    with open(file_path, 'a', newline='') as file:
-        writer = csv.writer(file)
-        # Write the data row
-        writer.writerow(list(input_data) + list(output_data))
+    with open(file_path, 'a') as file:
+        row = ', '.join(map(str, input_data+output_data))+'\n'
+        file.write(row)
 
 
 # TODO: consider how to read the file and use it;
