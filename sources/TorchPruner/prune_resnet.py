@@ -1,5 +1,6 @@
 import torch
 import torch_pruning as tp
+from ResNet.train_and_eval_resnet import fine_tune_resnet, evaluate_resnet, train_and_evaluate_resnet
 
 
 def prune_resnet_with_tp(model, prune_ratio=0.5):
@@ -38,3 +39,8 @@ def prune_resnet_with_tp(model, prune_ratio=0.5):
     pruner.step()
     macs, nparams = tp.utils.count_ops_and_params(model, example_inputs)
     return model
+
+
+def prune_resnet_and_fine_tune(model, prune_ratio, hyperparameters):
+    model = prune_resnet_with_tp(model, prune_ratio)
+    return train_and_evaluate_resnet(model, hyperparameters)
