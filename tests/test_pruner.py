@@ -16,6 +16,11 @@ def test_pruner():
 
 def test_query_profiled_result():
     accuracy, latency = query_profiled_result(
+        0.0, "profile_test_fast_resnet18_pruning_ratio2024-01-15-21-22-34.csv")
+    assert accuracy == pytest.approx(95.3)
+    assert latency == pytest.approx(1.324)
+
+    accuracy, latency = query_profiled_result(
         0.5, "profile_test_fast_resnet18_pruning_ratio2024-01-15-21-22-34.csv")
     assert accuracy == pytest.approx(84.74)
     assert latency == pytest.approx(0.963)

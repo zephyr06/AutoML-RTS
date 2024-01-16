@@ -58,7 +58,12 @@ def query_profiled_result(prune_ratio, profile_csv_file_name=None):
     return None, None
 
 
-def prune_resnet_and_fine_tune(model, prune_ratio, hyperparameters):
+def prune_resnet_and_fine_tune(model, prune_ratio, hyperparameters, profile_csv_file_name=None):
+    query_accuracy, query_latency = query_profiled_result(
+        prune_ratio, profile_csv_file_name)
+    if query_accuracy and query_latency:
+        return query_accuracy, query_latency
+
     if prune_ratio == 0.0:
         return train_and_evaluate_resnet(model, hyperparameters)
     model = prune_resnet_with_tp(model, prune_ratio)
