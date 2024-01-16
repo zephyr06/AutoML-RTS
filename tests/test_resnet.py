@@ -1,13 +1,10 @@
 import pytest
-from ResNet.Hyperparameters import Hyperparameters
+from ResNet.Hyperparameters import Hyperparameters, get_hp_test_cifar10_fast
 
 
 def test_train_eval_resnet():
     """Just to make sure the code can run"""
-    hyperparameters = Hyperparameters()
-    hyperparameters.data_size_train = 128
-    hyperparameters.data_size_test = 128
-    hyperparameters.num_epochs = 1
+    hyperparameters = get_hp_test_cifar10()
     from ResNet.train_and_eval_resnet import fine_tune_resnet, evaluate_resnet, device
 
     from torchvision.models import resnet18
