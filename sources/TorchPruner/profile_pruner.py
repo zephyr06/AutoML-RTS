@@ -3,7 +3,7 @@ import os
 from prune_resnet import prune_resnet_and_fine_tune
 from RecordIO.RecordIO import save_to_file
 from ResNet.variables import ROOT_PATH
-from ResNet.Hyperparameters import Hyperparameters, get_hp_test_cifar10, get_hp_test_cifar10_fast
+from ResNet.Hyperparameters import Hyperparameters, get_hp_formal_cifar10, get_hp_test_cifar10, get_hp_test_cifar10_fast
 
 from torchvision.models import resnet18
 
@@ -21,7 +21,7 @@ def get_date():
     return datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
 
-def profile_with_pruning_ratio(model, hyperparameters, record_file_name, granularity=0.05):
+def profile_with_pruning_ratio(model, hyperparameters, record_file_name, granularity=0.1):
     """Profile the model with pruning ratio, and save it to record_file_name"""
 
     file_path = create_csv_file(record_file_name)
@@ -35,7 +35,8 @@ def profile_with_pruning_ratio(model, hyperparameters, record_file_name, granula
 
 
 if __name__ == "__main__":
-    hyperparameters = get_hp_test_cifar10_fast()
+    # hyperparameters = get_hp_test_cifar10_fast()
+    hyperparameters = get_hp_formal_cifar10()
     model = resnet18(weights='ResNet18_Weights.DEFAULT')
     # model = resnet18(pretrained=True)
     profile_with_pruning_ratio(model, hyperparameters,
