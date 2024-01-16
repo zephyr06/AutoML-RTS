@@ -4,6 +4,8 @@ from ResNet.train_and_eval_resnet import fine_tune_resnet, evaluate_resnet, trai
 import os
 import pandas as pd
 from ResNet.variables import ROOT_PATH
+from math import isclose
+import numpy as np
 
 
 def prune_resnet_with_tp(model, prune_ratio=0.5):
@@ -50,9 +52,9 @@ def query_profiled_result(prune_ratio, profile_csv_file_name=None):
         path = os.path.join(ROOT_PATH, "profile_data", profile_csv_file_name)
         df = pd.read_csv(path)
         df.columns = ['prune_ratio', 'accuracy', 'latency']
-        row = df[df.iloc[:, 0] == prune_ratio]
+        row = df[np.isclose(df.iloc[:, 0], prune_ratio, rtol=0.01)]
         if not row.empty:
-            return float(row.iloc[0][['accuracy']]), float(row.iloc[0]['latency'])
+            return row.iloc[0]['accuracy'], row.iloc[0]['latency']
     return None, None
 
 

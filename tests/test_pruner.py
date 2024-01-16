@@ -19,3 +19,8 @@ def test_query_profiled_result():
         0.5, "profile_test_fast_resnet18_pruning_ratio2024-01-15-21-22-34.csv")
     assert accuracy == pytest.approx(84.74)
     assert latency == pytest.approx(0.963)
+
+    accuracy, latency = query_profiled_result(
+        0.55, "profile_test_fast_resnet18_pruning_ratio2024-01-15-21-22-34.csv")
+    assert accuracy == None
+    assert latency == None
