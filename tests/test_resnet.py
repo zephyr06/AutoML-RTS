@@ -1,10 +1,13 @@
 import pytest
+from ResNet.Hyperparameters import Hyperparameters
 
 
 def test_train_eval_resnet():
     """Just to make sure the code can run"""
-    hyperparameters = {"data_size_train": 128,
-                       "data_size_test": 128,  "num_epochs": 1}
+    hyperparameters = Hyperparameters()
+    hyperparameters.data_size_train = 128
+    hyperparameters.data_size_test = 128
+    hyperparameters.num_epochs = 1
     from ResNet.train_and_eval_resnet import fine_tune_resnet, evaluate_resnet, device
 
     from torchvision.models import resnet18
