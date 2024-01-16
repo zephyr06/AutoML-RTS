@@ -11,7 +11,7 @@ def test_train_eval_resnet():
     model = resnet18(pretrained=True)
     model.to(device)
     fine_tune_resnet(model, hyperparameters)
-    average_inference_time, final_accuracy = evaluate_resnet(
+    final_accuracy, average_inference_time = evaluate_resnet(
         model, hyperparameters)
     # Just test that the code can run
     assert final_accuracy >= 0.0

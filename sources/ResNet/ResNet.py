@@ -132,3 +132,29 @@ class ResNet(nn.Module):
         x = self.fc(x)
 
         return x
+
+
+def get_resnet_blocks(num_layers):
+    # Dictionary mapping the total number of layers to the number of layer blocks in each stage
+    resnet_configs = {
+        18: [2, 2, 2, 2],
+        34: [3, 4, 6, 3],
+        # Add more configurations as needed
+    }
+
+    # Check if the provided number of layers is in the dictionary
+    if num_layers in resnet_configs:
+        return resnet_configs[num_layers]
+    else:
+        # Redistribute layers for other cases
+        base_blocks = [3, 4, 6, 3]  # Base configuration for redistribution
+        total_blocks = sum(base_blocks)
+        redistributed_blocks = [
+            int(round(b * (num_layers - 2) / total_blocks)) for b in base_blocks]
+
+        # Adjust to ensure the total number of layers is exactly num_layers
+        diff = num_layers - 2 - sum(redistributed_blocks)
+        # Add the difference to the first stage
+        redistributed_blocks[0] += diff
+
+        return redistributed_blocks

@@ -3,39 +3,13 @@ import torch
 import torch.nn as nn
 
 from .Cifar10DataIO import data_loader
-from .ResNet import ResNet, ResidualBlock, device
-
-
-def get_resnet_blocks(num_layers):
-    # Dictionary mapping the total number of layers to the number of layer blocks in each stage
-    resnet_configs = {
-        18: [2, 2, 2, 2],
-        34: [3, 4, 6, 3],
-        # Add more configurations as needed
-    }
-
-    # Check if the provided number of layers is in the dictionary
-    if num_layers in resnet_configs:
-        return resnet_configs[num_layers]
-    else:
-        # Redistribute layers for other cases
-        base_blocks = [3, 4, 6, 3]  # Base configuration for redistribution
-        total_blocks = sum(base_blocks)
-        redistributed_blocks = [
-            int(round(b * (num_layers - 2) / total_blocks)) for b in base_blocks]
-
-        # Adjust to ensure the total number of layers is exactly num_layers
-        diff = num_layers - 2 - sum(redistributed_blocks)
-        # Add the difference to the first stage
-        redistributed_blocks[0] += diff
-
-        return redistributed_blocks
+from .ResNet import ResNet, ResidualBlock, device, get_resnet_blocks
+from .Hyperparameters import Hyperparameters
 
 
 def evaluate_resnet(model, hyperparameters):
-    data_size_test = hyperparameters.get("data_size_test", 1000)
-    num_classes = hyperparameters.get("num_classes", 10)
-    batch_size = hyperparameters.get("batch_size", 128)
+    data_size_test = hyperparameters.data_size_test
+    batch_size = hyperparameters.batch_size
 
     test_loader = data_loader(data_dir='./data',
                               batch_size=batch_size,
@@ -52,7 +26,7 @@ def evaluate_resnet(model, hyperparameters):
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-            # del images, labels, outputs
+            del images, labels, outputs
 
         end_inference_test_time = time.time()
         average_inference_time = (
@@ -62,19 +36,19 @@ def evaluate_resnet(model, hyperparameters):
             total, final_accuracy))
         print(f"Average running time per image during inference: ",
               average_inference_time, "seconds")
-    return average_inference_time, final_accuracy
+    return final_accuracy, average_inference_time
 
 
-def fine_tune_resnet(model, hyperparameters):
+def fine_tune_resnet(model, hp):
     model.to(device)
-    data_size_train = hyperparameters.get("data_size_train", 1000)
-    num_epochs = hyperparameters.get("num_epochs", 15)
-    batch_size = hyperparameters.get("batch_size", 128)
-    learning_rate = hyperparameters.get("learning_rate", 0.01)
+    data_size_train = hp.data_size_train
+    num_epochs = hp.num_epochs
+    batch_size = hp.batch_size
+    learning_rate = hp.learning_rate
 
     # CIFAR10 dataset
     train_loader, valid_loader = data_loader(data_dir='./data',
-                                             batch_size=batch_size, training_data_size=data_size_train)
+                                             batch_size=batch_size, training_data_size=hp.data_size_train)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(
@@ -125,25 +99,13 @@ def fine_tune_resnet(model, hyperparameters):
     return model
 
 
-def train_and_evaluate_resnet(model, hyperparameters):
+def train_and_evaluate_resnet(model, hp):
     start_all_time = time.time()
 
-    # extract hyper-parameters
-    data_size_train = hyperparameters.get("data_size_train", 1000)
-    data_size_test = hyperparameters.get("data_size_test", 1000)
-    num_epochs = hyperparameters.get("num_epochs", 15)
-    batch_size = hyperparameters.get("batch_size", 128)
-    learning_rate = hyperparameters.get("learning_rate", 0.01)
+    model = fine_tune_resnet(model=model, hp=hp)
 
-    # ************************************* Optimization variables *************************************
-    prune_ratio = hyperparameters.get("prune_ratio", 0)
-    quant_type = hyperparameters.get("quant_type", "qint8")
-    # layer_num = hyperparameters.get("layer_num", 34)
-
-    model = fine_tune_resnet(model=model, hyperparameters=hyperparameters)
-
-    average_inference_time, final_accuracy = evaluate_resnet(
-        model, hyperparameters)
+    final_accuracy, average_inference_time = evaluate_resnet(
+        model, hp)
 
     end_all_time = time.time()
     total_run_time = end_all_time - start_all_time
@@ -152,8 +114,8 @@ def train_and_evaluate_resnet(model, hyperparameters):
 
 
 def load_train_evaluate_resnet(hyperparameters):
-    layer_num = hyperparameters.get("layer_num", 34)
-    num_classes = hyperparameters.get("num_classes", 10)
+    layer_num = 18
+    num_classes = 10
     layer_dist = get_resnet_blocks(num_layers=layer_num)
     model = ResNet(ResidualBlock, layer_dist, prune_ratio=0, quant_type="none",
                    num_classes=num_classes).to(device)
