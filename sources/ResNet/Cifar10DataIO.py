@@ -11,7 +11,7 @@ def data_loader(data_dir,
                 batch_size,
                 random_seed=42,
                 valid_size=0.1,
-                shuffle=True,
+                shuffle=False,
                 test_only=False,
                 training_data_size=1000,
                 test_data_size=1000):
