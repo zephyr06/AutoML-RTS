@@ -12,7 +12,7 @@ def create_csv_file(file_name):
     file_path = os.path.join(ROOT_PATH, "profile_data",
                              file_name+get_date()+".csv")
     with open(file_path, 'w') as file:
-        pass
+        file.write("Pruning_ratio, Accuracy, Latency\n")
     return file_path
 
 
