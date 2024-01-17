@@ -2,11 +2,11 @@ import warnings
 
 from TorchPruner.prune_resnet import prune_resnet_and_fine_tune
 from ResNet.train_and_eval_resnet import train_and_evaluate_resnet
-
+from RecordIO.WritingInfo import WritingInfo, get_output_file_name
 
 def automl_bs_find_pruning_ratio(model, hyperparameters_model, train_data_loader,
-                                 test_data_loader, perf_required: float, granularity=0.1,
-                                 profile_csv_file_name=None):
+                                 test_data_loader, perf_required: float, granularity=0.1, \
+                                    writing_info : WritingInfo=None):
     """Perform binary search to find the maximum pruning ratio while satisfying the performance requirement.
     Pruning ratio refers to the portion of channels to be pruned.
     This function combines both profiling and optimization.
@@ -18,13 +18,13 @@ def automl_bs_find_pruning_ratio(model, hyperparameters_model, train_data_loader
     - Performance and Latency are monotonically decreasing when the pruning ratio is increasing;
     """
     accuracy_no_prune, latency_no_prune = prune_resnet_and_fine_tune(
-        model, 0.0, hyperparameters_model, profile_csv_file_name)
+        model, 0.0, hyperparameters_model, writing_info)
     if accuracy_no_prune < perf_required:
         warnings.warn(
             f"Accuracy without pruning is {accuracy_no_prune}, which is lower than the required {perf_required}.")
         return None, None, None
     accuracy_max_prune, latency_max_prune = prune_resnet_and_fine_tune(
-        model, 1-granularity, hyperparameters_model, profile_csv_file_name)
+        model, 1-granularity, hyperparameters_model, writing_info)
     if accuracy_max_prune >= perf_required:
         return 1-granularity, accuracy_max_prune, latency_max_prune
 
@@ -37,7 +37,7 @@ def automl_bs_find_pruning_ratio(model, hyperparameters_model, train_data_loader
         prune_ratio = (prune_ratio_lower + prune_ratio_upper) / 2
         prune_ratio = int(prune_ratio/granularity) * granularity
         accuracy, latency = prune_resnet_and_fine_tune(
-            model, prune_ratio, hyperparameters_model, profile_csv_file_name)
+            model, prune_ratio, hyperparameters_model, writing_info)
         if accuracy >= perf_required:
             final_accuracy = accuracy
             final_latency = latency
@@ -46,7 +46,7 @@ def automl_bs_find_pruning_ratio(model, hyperparameters_model, train_data_loader
             prune_ratio_upper = prune_ratio-granularity
     # exam whether prune_ratio_upper is the final result
     accuracy_upper, latency_upper = prune_resnet_and_fine_tune(
-        model, prune_ratio_upper, hyperparameters_model, profile_csv_file_name)
+        model, prune_ratio_upper, hyperparameters_model, writing_info)
     if accuracy_upper >= perf_required:
         final_accuracy = accuracy_upper
         final_latency = latency_upper

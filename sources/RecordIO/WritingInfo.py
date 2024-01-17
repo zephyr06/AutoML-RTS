@@ -6,6 +6,14 @@ class WritingInfo:
         self.latency = latency
         self.training_data_noise = training_data_noise
         self.model_name = model_name
+    def __init__(self, profile_csv_file_name: str):
+        self.pruning_ratio = -1
+        self.accuracy = -1
+        self.latency = -1
+
+        parts = profile_csv_file_name.split('_')
+        self.model_name = parts[2]
+        self.training_data_noise = parts[4]
 
     
 def get_output_file_name(model_name, training_data_noise):

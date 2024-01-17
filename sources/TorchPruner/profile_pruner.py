@@ -6,7 +6,7 @@ from ResNet.variables import ROOT_PATH
 from ResNet.Hyperparameters import Hyperparameters, get_hp_formal_cifar10, get_hp_test_cifar10, get_hp_test_cifar10_fast
 
 from torchvision.models import resnet18
-from RecordIO.WritingInfo import  get_output_file_name
+from RecordIO.WritingInfo import  WritingInfo, get_output_file_name
 
 
 

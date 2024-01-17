@@ -3,7 +3,8 @@ import torch_pruning as tp
 from ResNet.train_and_eval_resnet import fine_tune_resnet, evaluate_resnet, train_and_evaluate_resnet
 from ResNet.variables import ROOT_PATH
 
-from RecordIO.RecordIO import  query_profiled_result
+from RecordIO.RecordIO import  query_profiled_result, find_record, get_csv_file, save_to_file
+from RecordIO.WritingInfo import WritingInfo, get_output_file_name
 
 def prune_resnet_with_tp(model, prune_ratio=0.5):
     model.to('cpu')
@@ -45,16 +46,22 @@ def prune_resnet_with_tp(model, prune_ratio=0.5):
 
 
 
-def prune_resnet_and_fine_tune(model, prune_ratio, hyperparameters, profile_csv_file_name=None):
-    query_accuracy, query_latency = query_profiled_result(
-        prune_ratio, profile_csv_file_name)
-    if query_accuracy and query_latency:
-        return query_accuracy, query_latency
+def prune_resnet_and_fine_tune(model, prune_ratio, hyperparameters, writing_info=None):
+    
+    if writing_info:
+        query_accuracy, query_latency = find_record(writing_info.model_name, writing_info.training_data_noise, prune_ratio)  
+        if query_accuracy and query_latency:
+            return query_accuracy, query_latency
 
     if prune_ratio == 0.0:
-        return train_and_evaluate_resnet(model, hyperparameters)
-    model = prune_resnet_with_tp(model, prune_ratio)
-    accuracy_fine_tuned, latency_fine_tuned = train_and_evaluate_resnet(model, hyperparameters)
-    # if not query_accuracy and not query_latency:
-    #     save_to_file([prune_ratio], [accuracy_fine_tuned, latency_fine_tuned], profile_csv_file_name)
+        accuracy_fine_tuned, latency_fine_tuned = train_and_evaluate_resnet(model, hyperparameters)
+    else:
+        model = prune_resnet_with_tp(model, prune_ratio)
+        accuracy_fine_tuned, latency_fine_tuned = train_and_evaluate_resnet(model, hyperparameters)
+    
+    # save the result to file
+    profile_file_name = get_output_file_name(writing_info.model_name, writing_info.training_data_noise)
+    profile_csv_file_path = get_csv_file(profile_file_name)
+    save_to_file([prune_ratio], [accuracy_fine_tuned, latency_fine_tuned], profile_csv_file_path)
+
     return accuracy_fine_tuned, latency_fine_tuned
