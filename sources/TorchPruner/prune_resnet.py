@@ -1,12 +1,9 @@
 import torch
 import torch_pruning as tp
 from ResNet.train_and_eval_resnet import fine_tune_resnet, evaluate_resnet, train_and_evaluate_resnet
-import os
-import pandas as pd
 from ResNet.variables import ROOT_PATH
-from math import isclose
-import numpy as np
 
+from RecordIO.RecordIO import  query_profiled_result
 
 def prune_resnet_with_tp(model, prune_ratio=0.5):
     model.to('cpu')
@@ -46,16 +43,6 @@ def prune_resnet_with_tp(model, prune_ratio=0.5):
     return model
 
 
-def query_profiled_result(prune_ratio, profile_csv_file_name=None):
-    """Query the profiled result from the profile_csv_file, return accuracy and latency"""
-    if profile_csv_file_name:
-        path = os.path.join(ROOT_PATH, "profile_data", profile_csv_file_name)
-        df = pd.read_csv(path)
-        df.columns = ['prune_ratio', 'accuracy', 'latency']
-        row = df[np.isclose(df.iloc[:, 0], prune_ratio, rtol=0.01)]
-        if not row.empty:
-            return row.iloc[0]['accuracy'], row.iloc[0]['latency']
-    return None, None
 
 
 def prune_resnet_and_fine_tune(model, prune_ratio, hyperparameters, profile_csv_file_name=None):
@@ -67,4 +54,7 @@ def prune_resnet_and_fine_tune(model, prune_ratio, hyperparameters, profile_csv_
     if prune_ratio == 0.0:
         return train_and_evaluate_resnet(model, hyperparameters)
     model = prune_resnet_with_tp(model, prune_ratio)
-    return train_and_evaluate_resnet(model, hyperparameters)
+    accuracy_fine_tuned, latency_fine_tuned = train_and_evaluate_resnet(model, hyperparameters)
+    # if not query_accuracy and not query_latency:
+    #     save_to_file([prune_ratio], [accuracy_fine_tuned, latency_fine_tuned], profile_csv_file_name)
+    return accuracy_fine_tuned, latency_fine_tuned
