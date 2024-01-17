@@ -45,7 +45,7 @@ def prune_resnet_with_tp(model, prune_ratio=0.5):
 
 
 
-
+# TODO: test whether this function correctly saves the result to file
 def prune_resnet_and_fine_tune(model, prune_ratio, hyperparameters, writing_info=None):
     
     if writing_info:
