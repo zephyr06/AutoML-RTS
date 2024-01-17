@@ -6,6 +6,7 @@ class Hyperparameters:
         self.batch_size = 128
         self.learning_rate = 0.01
         self.num_classes = 10
+        self.training_noise = 0.0
 
     def print_hyperparameters(self):
         print("Hyperparameters:")
@@ -15,6 +16,7 @@ class Hyperparameters:
         print("batch_size:", self.batch_size)
         print("learning_rate:", self.learning_rate)
         print("num_classes:", self.num_classes)
+        print("training_noise:", self.training_noise)
 
 
 def get_hp_formal_cifar10():

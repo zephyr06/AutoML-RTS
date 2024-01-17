@@ -37,7 +37,8 @@ def profile_with_pruning_ratio(model, hyperparameters, record_file_name, granula
 if __name__ == "__main__":
     # hyperparameters = get_hp_test_cifar10_fast()
     hyperparameters = get_hp_formal_cifar10()
+    hyperparameters.training_noise = 0.1
     model = resnet18(weights='ResNet18_Weights.DEFAULT')
     # model = resnet18(pretrained=True)
     profile_with_pruning_ratio(model, hyperparameters,
-                               "profile_test_fast_resnet18_pruning_ratio")
+                               "profile_test_fast_resnet18_pruning_ratio_0.1_noise")

@@ -48,7 +48,9 @@ def fine_tune_resnet(model, hp):
 
     # CIFAR10 dataset
     train_loader, valid_loader = data_loader(data_dir='./data',
-                                             batch_size=batch_size, training_data_size=hp.data_size_train)
+                                             batch_size=batch_size,
+                                             training_data_size=hp.data_size_train,
+                                             training_noise_chance=hp.training_noise)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(

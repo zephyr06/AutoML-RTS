@@ -4,7 +4,7 @@ from ResNet.Hyperparameters import Hyperparameters, get_hp_test_cifar10_fast
 
 def test_train_eval_resnet():
     """Just to make sure the code can run"""
-    hyperparameters = get_hp_test_cifar10()
+    hyperparameters = get_hp_test_cifar10_fast()
     from ResNet.train_and_eval_resnet import fine_tune_resnet, evaluate_resnet, device
 
     from torchvision.models import resnet18
