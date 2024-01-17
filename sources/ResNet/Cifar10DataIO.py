@@ -5,17 +5,21 @@ from torch.utils.data import Subset
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import datasets
 from torchvision import transforms
+import random
 
 
 def data_loader(data_dir,
                 batch_size,
                 random_seed=42,
                 valid_size=0.1,
-                shuffle=False,
+                shuffle=True,
                 test_only=False,
                 training_data_size=1000,
-                test_data_size=1000):
+                test_data_size=1000,
+                training_noise_chance=0.0):
     """Load the CIFAR10 dataset and perform preprocessing, with simple data size assignments for the convenience of development."""
+
+    random.seed(random_seed)
     normalize = transforms.Normalize(
         mean=[0.4914, 0.4822, 0.4465],
         std=[0.2023, 0.1994, 0.2010],
@@ -27,6 +31,14 @@ def data_loader(data_dir,
         transforms.ToTensor(),
         normalize,
     ])
+
+    # TODO: consider save the dataset with noise
+    def add_target_noise(label):
+        if random.random() < training_noise_chance:
+            # Return a random label between 0 and 9
+            return random.randint(0, 9)
+        else:
+            return label
 
     if test_only:
         dataset = datasets.CIFAR10(
@@ -42,7 +54,7 @@ def data_loader(data_dir,
     # load the dataset
     train_dataset = datasets.CIFAR10(
         root=data_dir, train=True,
-        download=True, transform=transform,
+        download=True, transform=transform, target_transform=add_target_noise
     )
     train_dataset = Subset(train_dataset, list(range(training_data_size)))
 
