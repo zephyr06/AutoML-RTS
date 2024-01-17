@@ -1,6 +1,6 @@
 
 
-from prune_resnet import prune_resnet_and_fine_tune
+from TorchPruner.prune_resnet import prune_resnet_and_fine_tune
 from RecordIO.RecordIO import save_to_file, get_csv_file, query_profiled_result, find_record
 from ResNet.variables import ROOT_PATH
 from ResNet.Hyperparameters import Hyperparameters, get_hp_formal_cifar10, get_hp_test_cifar10, get_hp_test_cifar10_fast
