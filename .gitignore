@@ -30,3 +30,4 @@ TorchPruner/test-trainer/*
 TorchPruner/*lib
 
 learn_hf/test-trainer/*
+scripts/Visualization/data/*
