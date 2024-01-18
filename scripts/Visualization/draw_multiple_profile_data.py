@@ -4,12 +4,10 @@ import glob
 import os
 from ResNet.variables import ROOT_PATH
 import seaborn as sns
-from utils import read_df_from_csv, marker_styles
+from utils import read_df_from_csv, marker_styles, get_all_profile_files
 
-data_folder_path = os.path.join(
-    ROOT_PATH, "profile_data", "profile_data_resnet18_noise_0.*.csv")
-csv_files = glob.glob(data_folder_path)
-csv_files = sorted(csv_files)
+
+csv_files = get_all_profile_files("profile_data_resnet18_noise_0.*.csv")
 file_num = len(csv_files)
 
 # Get colors from 'husl' palette
