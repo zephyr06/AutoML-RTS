@@ -4,7 +4,7 @@ import glob
 from ResNet.variables import ROOT_PATH
 import os
 import seaborn as sns
-
+from utils import read_df_from_csv
 sns.set_palette("husl")
 
 
@@ -12,8 +12,7 @@ def draw_profile_data_2metric(csv_file_name):
     # Find all CSV files that match the pattern
     csv_file_name = os.path.join(ROOT_PATH, "profile_data", csv_file_name)
     # Read the CSV file into a DataFrame
-    df = pd.read_csv(csv_file_name, names=[
-                     "Pruning_ratio", "Accuracy", "Latency"], header=0)
+    df = read_df_from_csv(csv_file_name)
 
     # Get colors from 'husl' palette
     colors = sns.color_palette('husl', n_colors=2)
