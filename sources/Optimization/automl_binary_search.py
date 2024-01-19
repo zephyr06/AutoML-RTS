@@ -4,9 +4,14 @@ from TorchPruner.prune_resnet import prune_resnet_and_fine_tune
 from ResNet.train_and_eval_resnet import train_and_evaluate_resnet
 from RecordIO.WritingInfo import WritingInfo, get_output_file_name
 
+
+def cut_to_nearest(x, a=0.1):
+    return int(x / a) * a
+
+
 def automl_bs_find_pruning_ratio(model, hyperparameters_model, train_data_loader,
-                                 test_data_loader, perf_required: float, granularity=0.1, \
-                                    writing_info : WritingInfo=None):
+                                 test_data_loader, perf_required: float, granularity=0.1,
+                                 writing_info: WritingInfo = None):
     """Perform binary search to find the maximum pruning ratio while satisfying the performance requirement.
     Pruning ratio refers to the portion of channels to be pruned.
     This function combines both profiling and optimization.
@@ -33,7 +38,12 @@ def automl_bs_find_pruning_ratio(model, hyperparameters_model, train_data_loader
     prune_ratio_upper = 1-granularity
     final_accuracy = accuracy_no_prune
     final_latency = latency_no_prune
+    iteration_max = 100
+    iteration_count = 0
     while (prune_ratio_lower+granularity < prune_ratio_upper):
+        prune_ratio_lower = cut_to_nearest(prune_ratio_lower, granularity)
+        prune_ratio_upper = cut_to_nearest(prune_ratio_upper, granularity)
+
         prune_ratio = (prune_ratio_lower + prune_ratio_upper) / 2
         prune_ratio = int(prune_ratio/granularity) * granularity
         accuracy, latency = prune_resnet_and_fine_tune(
@@ -44,6 +54,12 @@ def automl_bs_find_pruning_ratio(model, hyperparameters_model, train_data_loader
             prune_ratio_lower = prune_ratio
         else:
             prune_ratio_upper = prune_ratio-granularity
+        iteration_count += 1
+        if iteration_count > iteration_max:
+            warnings.warn(
+                f"Binary search has reached the maximum iteration {iteration_max}.")
+            raise ValueError("Pruning ratio not found. Terminating the code.")
+            # break
     # exam whether prune_ratio_upper is the final result
     accuracy_upper, latency_upper = prune_resnet_and_fine_tune(
         model, prune_ratio_upper, hyperparameters_model, writing_info)
