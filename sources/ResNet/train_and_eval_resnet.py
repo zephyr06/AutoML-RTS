@@ -7,7 +7,7 @@ from .ResNet import ResNet, ResidualBlock, device, get_resnet_blocks
 from .Hyperparameters import Hyperparameters
 
 
-def evaluate_resnet(model, hyperparameters):
+def evaluate_resnet_one_time(model, hyperparameters):
     data_size_test = hyperparameters.data_size_test
     batch_size = hyperparameters.batch_size
 
@@ -37,6 +37,16 @@ def evaluate_resnet(model, hyperparameters):
         print(f"Average running time per image during inference: ",
               average_inference_time, "seconds")
     return final_accuracy, average_inference_time
+
+
+def evaluate_resnet(model, hyperparameters, repeat=5):
+    accuracy_list = []
+    inference_time_list = []
+    for i in range(repeat):
+        accuracy, latency = evaluate_resnet_one_time(model, hyperparameters)
+        accuracy_list.append(accuracy)
+        inference_time_list.append(latency)
+    return sum(accuracy_list)/len(accuracy_list), sum(inference_time_list)/len(inference_time_list)
 
 
 def fine_tune_resnet(model, hp):
