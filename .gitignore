@@ -31,4 +31,5 @@ TorchPruner/*lib
 
 learn_hf/test-trainer/*
 scripts/Visualization/data/*
+scripts/data/*
 build/*
