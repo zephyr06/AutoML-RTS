@@ -6,6 +6,7 @@ import pandas as pd
 from ResNet.variables import ROOT_PATH
 from RecordIO.WritingInfo import WritingInfo, get_output_file_name
 
+
 def get_csv_file(file_name):
     file_path = os.path.join(ROOT_PATH, "profile_data",
                              file_name)
@@ -13,8 +14,6 @@ def get_csv_file(file_name):
         with open(file_path, 'w') as file:
             file.write("Pruning_ratio, Accuracy, Latency\n")
     return file_path
-
-
 
 
 def save_to_file(input_data, output_data, file_path):
@@ -28,10 +27,11 @@ def query_profiled_result(prune_ratio, profile_csv_file_name=None):
     if profile_csv_file_name:
         path = os.path.join(ROOT_PATH, "profile_data", profile_csv_file_name)
         df = pd.read_csv(path)
-        df.columns = ['prune_ratio', 'accuracy', 'latency']
-        row = df[np.isclose(df.iloc[:, 0], prune_ratio, rtol=0.01)]
-        if not row.empty:
-            return row.iloc[0]['accuracy'], row.iloc[0]['latency']
+        if not df.empty:
+            df.columns = ['prune_ratio', 'accuracy', 'latency']
+            row = df[np.isclose(df.iloc[:, 0], prune_ratio, rtol=0.01)]
+            if not row.empty:
+                return row.iloc[0]['accuracy'], row.iloc[0]['latency']
     return None, None
 
 
@@ -40,7 +40,7 @@ def find_record(model_name, training_data_noise, pruning_ratio):
     file_path = get_csv_file(file_name)
     if not os.path.exists(file_path):
         return None, None
-    
+
     return query_profiled_result(pruning_ratio, file_name)
 
 
