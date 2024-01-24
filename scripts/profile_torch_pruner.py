@@ -7,6 +7,7 @@ from ResNet.Hyperparameters import Hyperparameters, get_hp_formal_cifar10, get_h
 
 from torchvision.models import resnet18
 from RecordIO.WritingInfo import WritingInfo, get_output_file_name
+import argparse
 
 
 def profile_with_pruning_ratio(model, hyperparameters_model, model_name, training_data_noise,
@@ -32,10 +33,14 @@ def profile_with_pruning_ratio(model, hyperparameters_model, model_name, trainin
 
 
 if __name__ == "__main__":
-    hyperparameters = get_hp_test_cifar10_fast()
-    # hyperparameters = get_hp_formal_cifar10()
-    hyperparameters.training_noise = 0.1
+    parser = argparse.ArgumentParser(description='Profile Torch Pruner')
+    parser.add_argument('--training_noise', type=float, default=0.0,
+                        help='Training noise level')
+    args = parser.parse_args()
+    # hyperparameters = get_hp_test_cifar10_fast()
+    hyperparameters = get_hp_formal_cifar10()
+
+    hyperparameters.training_noise = args.training_noise
     model = resnet18(weights='ResNet18_Weights.DEFAULT')
-    # model = resnet18(pretrained=True)
-    profile_with_pruning_ratio(model, hyperparameters,
-                               "resnet18", "0.0")
+    profile_with_pruning_ratio(
+        model, hyperparameters, "resnet18", str(hyperparameters.training_noise))
