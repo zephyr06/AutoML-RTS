@@ -49,7 +49,7 @@ def evaluate_resnet(model, hyperparameters, repeat=10):
 
     avg_accuracy = round(sum(accuracy_list)/len(accuracy_list), 3)
     avg_inference_time = round(
-        sum(inference_time_list)/len(inference_time_list), 3)
+        sum(inference_time_list)/len(inference_time_list), 8)
 
     return avg_accuracy, avg_inference_time
 
