@@ -39,14 +39,19 @@ def evaluate_resnet_one_time(model, hyperparameters):
     return final_accuracy, average_inference_time
 
 
-def evaluate_resnet(model, hyperparameters, repeat=5):
+def evaluate_resnet(model, hyperparameters, repeat=10):
     accuracy_list = []
     inference_time_list = []
     for i in range(repeat):
         accuracy, latency = evaluate_resnet_one_time(model, hyperparameters)
         accuracy_list.append(accuracy)
         inference_time_list.append(latency)
-    return sum(accuracy_list)/len(accuracy_list), sum(inference_time_list)/len(inference_time_list)
+
+    avg_accuracy = round(sum(accuracy_list)/len(accuracy_list), 3)
+    avg_inference_time = round(
+        sum(inference_time_list)/len(inference_time_list), 3)
+
+    return avg_accuracy, avg_inference_time
 
 
 def fine_tune_resnet(model, hp):
