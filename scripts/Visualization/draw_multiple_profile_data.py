@@ -10,12 +10,15 @@ import argparse
 parser = argparse.ArgumentParser(description='Draw multiple profile data.')
 parser.add_argument('--draw_option', default='accuracy',
                     help='accuracy or latency')
-
+parser.add_argument('--resnet_layer', type=int, default=34,
+                    help='ResNet layer number')
 args = parser.parse_args()
 
 option = args.draw_option
+resnet_layer = args.resnet_layer
 
-csv_files = get_all_profile_files("profile_data_resnet18_noise_0.*.csv")
+csv_files = get_all_profile_files(
+    f"profile_data_resnet{resnet_layer}_noise_0.*.csv")
 file_num = len(csv_files)
 
 # Get colors from 'husl' palette
