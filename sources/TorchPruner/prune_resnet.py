@@ -1,7 +1,7 @@
 import torch
 import torch_pruning as tp
-from ResNet.train_and_eval_resnet import fine_tune_resnet, evaluate_resnet, train_and_evaluate_resnet
-from ResNet.variables import ROOT_PATH
+from ResNetTrain.train_and_eval_resnet import fine_tune_resnet, evaluate_resnet, train_and_evaluate_resnet
+from ResNetTrain.variables import ROOT_PATH
 
 from RecordIO.RecordIO import query_profiled_result, find_record, get_csv_file, save_to_file
 from RecordIO.WritingInfo import WritingInfo, get_output_file_name

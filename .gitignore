@@ -34,3 +34,4 @@ scripts/Visualization/data/*
 scripts/data/*
 build/*
 tests/data/cifar*
+sources/ResNetTrain/data/*

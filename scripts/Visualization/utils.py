@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import glob
 
-from ResNet.variables import ROOT_PATH
+from ResNetTrain.variables import ROOT_PATH
 
 # Define a list of marker styles
 marker_styles = ['o', 's', '^', 'v', '<', '>', 'D', 'P', '*', 'H']

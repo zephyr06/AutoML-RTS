@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from ResNet.variables import ROOT_PATH
+from ResNetTrain.variables import ROOT_PATH
 from RecordIO.WritingInfo import WritingInfo, get_output_file_name
 
 

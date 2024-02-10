@@ -1,6 +1,6 @@
 import pytest
 
-from ResNet.Cifar10DataIO import data_loader
+from ResNetTrain.Cifar10DataIO import data_loader
 
 batch_size = 64
 

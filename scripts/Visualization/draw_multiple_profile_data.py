@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import glob
 import os
-from ResNet.variables import ROOT_PATH
+from ResNetTrain.variables import ROOT_PATH
 import seaborn as sns
 from utils import read_df_from_csv, marker_styles, get_all_profile_files
 import argparse

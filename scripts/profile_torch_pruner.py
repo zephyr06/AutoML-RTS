@@ -2,10 +2,10 @@
 
 from TorchPruner.prune_resnet import prune_resnet_and_fine_tune
 from RecordIO.RecordIO import save_to_file, get_csv_file, query_profiled_result, find_record
-from ResNet.variables import ROOT_PATH
-from ResNet.Hyperparameters import Hyperparameters, get_hp_formal_cifar10, get_hp_test_cifar10, get_hp_test_cifar10_fast
+from ResNetTrain.variables import ROOT_PATH
+from ResNetTrain.Hyperparameters import Hyperparameters, get_hp_formal_cifar10, get_hp_test_cifar10, get_hp_test_cifar10_fast, get_hp_formal_cifar10_resnet50
 
-from torchvision.models import resnet18
+from torchvision.models import resnet18, resnet34, resnet50
 from RecordIO.WritingInfo import WritingInfo, get_output_file_name
 import argparse
 
@@ -34,13 +34,14 @@ def profile_with_pruning_ratio(model, hyperparameters_model, model_name, trainin
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Profile Torch Pruner')
-    parser.add_argument('--training_noise', type=float, default=0.0,
+    parser.add_argument('--training_poison_chance', type=float, default=0.0,
                         help='Training noise level')
     args = parser.parse_args()
     # hyperparameters = get_hp_test_cifar10_fast()
-    hyperparameters = get_hp_formal_cifar10()
+    hyperparameters = get_hp_formal_cifar10_resnet50()
 
-    hyperparameters.training_noise = args.training_noise
-    model = resnet18(weights='ResNet18_Weights.DEFAULT')
+    hyperparameters.training_poison_chance = args.training_poison_chance
+    # model = resnet18(weights='ResNet18_Weights.DEFAULT')
+    model = resnet50(weights='ResNet50_Weights.DEFAULT')
     profile_with_pruning_ratio(
-        model, hyperparameters, "resnet18", str(hyperparameters.training_noise))
+        model, hyperparameters, "resnet50", str(hyperparameters.training_poison_chance))

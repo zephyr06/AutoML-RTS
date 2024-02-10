@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from Optimization.automl_binary_search import automl_bs_find_pruning_ratio
 from utils import read_df_from_csv, marker_styles, get_all_profile_files
-from ResNet.Hyperparameters import get_hp_formal_cifar10
+from ResNetTrain.Hyperparameters import get_hp_formal_cifar10
 from RecordIO.WritingInfo import WritingInfo
 
 

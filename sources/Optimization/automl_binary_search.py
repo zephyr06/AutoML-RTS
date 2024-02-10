@@ -1,7 +1,7 @@
 import warnings
 
 from TorchPruner.prune_resnet import prune_resnet_and_fine_tune
-from ResNet.train_and_eval_resnet import train_and_evaluate_resnet
+from ResNetTrain.train_and_eval_resnet import train_and_evaluate_resnet
 from RecordIO.WritingInfo import WritingInfo, get_output_file_name
 
 

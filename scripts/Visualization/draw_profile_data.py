@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import glob
-from ResNet.variables import ROOT_PATH
+from ResNetTrain.variables import ROOT_PATH
 import os
 import seaborn as sns
 from utils import read_df_from_csv
@@ -35,7 +35,7 @@ def draw_profile_data_2metric(csv_file_name):
                  marker='*', ax=ax2, label='Latency', color=colors[1])
     ax2.set_ylabel('Latency (s)', color=colors[1])
     ax2.tick_params(axis='y')
-    ax2.set_ylim([0.8, 1.4])
+    ax2.set_ylim([0.8, 3])
 
     ax1.set_xlim([-0.1, 1.0])
 
@@ -54,5 +54,8 @@ def draw_profile_data_2metric(csv_file_name):
 
 
 if __name__ == "__main__":
+    # draw_profile_data_2metric(
+    #     "profile_data_resnet18_noise_0.2.csv")
+
     draw_profile_data_2metric(
-        "profile_data_resnet18_noise_0.2.csv")
+        "profile_data_resnet50_noise_0.0.csv")

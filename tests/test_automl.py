@@ -2,7 +2,7 @@
 from torchvision.models import resnet18
 import pytest
 
-from ResNet.Hyperparameters import get_hp_formal_cifar10
+from ResNetTrain.Hyperparameters import get_hp_formal_cifar10
 from Optimization.automl_binary_search import automl_bs_find_pruning_ratio
 from RecordIO.WritingInfo import WritingInfo
 
