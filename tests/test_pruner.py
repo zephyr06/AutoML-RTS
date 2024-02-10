@@ -7,7 +7,7 @@ from TorchPruner.prune_resnet import prune_resnet_with_tp, query_profiled_result
 
 
 def test_pruner():
-    model = resnet18(pretrained=True)
+    model = resnet18(weights='ResNet18_Weights.DEFAULT')
     initial_layer = model.layer1[0].conv1.out_channels
     model = prune_resnet_with_tp(model, 0.5)
     pruned_layer = model.layer1[0].conv1.out_channels
