@@ -65,7 +65,7 @@ def fine_tune_resnet(model, hp):
     train_loader, valid_loader = data_loader(data_dir='./data',
                                              batch_size=batch_size,
                                              training_data_size=hp.data_size_train,
-                                             training_noise_chance=hp.training_noise)
+                                             training_poison_chance=hp.training_poison_chance)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(

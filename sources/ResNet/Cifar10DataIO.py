@@ -16,7 +16,7 @@ def data_loader(data_dir,
                 test_only=False,
                 training_data_size=1000,
                 test_data_size=1000,
-                training_noise_chance=0.0):
+                training_poison_chance=0.0):
     """Load the CIFAR10 dataset and perform preprocessing, with simple data size assignments for the convenience of development."""
 
     random.seed(random_seed)
@@ -34,7 +34,7 @@ def data_loader(data_dir,
 
     # TODO: consider save the dataset with noise
     def add_target_noise(label):
-        if random.random() < training_noise_chance:
+        if random.random() < training_poison_chance:
             # Return a random label between 0 and 9
             return random.randint(0, 9)
         else:

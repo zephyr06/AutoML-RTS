@@ -6,7 +6,7 @@ batch_size = 64
 
 
 def test_data_loader():
-    data_size=100
+    data_size = 100
     train_loader, valid_loader = data_loader(data_dir='./data',
                                              batch_size=batch_size,
                                              test_only=False,
@@ -26,7 +26,7 @@ def test_data_loader_add_noise():
                                              batch_size=batch_size,
                                              test_only=False,
                                              training_data_size=train_data_size,
-                                             test_data_size=10, training_noise_chance=0.5)
+                                             test_data_size=10, training_poison_chance=0.5)
     label_sum_w_noise = 0
     for i, (images, labels) in enumerate(train_loader):
         label_sum_w_noise += labels.sum().item()
@@ -35,7 +35,7 @@ def test_data_loader_add_noise():
                                              batch_size=batch_size,
                                              test_only=False,
                                              training_data_size=train_data_size,
-                                             test_data_size=10, training_noise_chance=0)
+                                             test_data_size=10, training_poison_chance=0)
     label_sum_wo_noise = 0
     for i, (images, labels) in enumerate(train_loader):
         label_sum_wo_noise += labels.sum().item()
