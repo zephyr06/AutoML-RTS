@@ -22,11 +22,24 @@ def save_to_file(input_data, output_data, file_path):
         file.write(row)
 
 
+def whether_contain_header(path):
+    with open(path, 'r') as file:
+        lines = file.readlines()
+        first_line = lines[0]
+        if (first_line[0].isdigit()):
+            return False
+        else:
+            return True
+
+
 def query_profiled_result(prune_ratio, profile_csv_file_name=None):
     """Query the profiled result from the specific profile_csv_file, return accuracy and latency"""
     if profile_csv_file_name:
         path = os.path.join(ROOT_PATH, "profile_data", profile_csv_file_name)
-        df = pd.read_csv(path)
+        if whether_contain_header(path):
+            df = pd.read_csv(path)
+        else:
+            df = pd.read_csv(path, header=None)
         if not df.empty:
             df.columns = ['prune_ratio', 'accuracy', 'latency']
             row = df[np.isclose(df.iloc[:, 0], prune_ratio, rtol=0.01)]
