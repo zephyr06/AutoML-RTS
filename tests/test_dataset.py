@@ -5,6 +5,7 @@ from ResNetTrain.Cifar10DataIO import data_loader, get_mean_std, exam_and_prepar
 batch_size = 64
 
 
+@pytest.mark.timeout(5)
 def test_data_loader():
     data_size = 100
     train_loader, valid_loader = data_loader(data_dir='./data',
@@ -23,6 +24,7 @@ def test_data_loader():
     assert pytest.approx([1, 1, 1], abs=1e-1) == std
 
 
+@pytest.mark.timeout(5)
 def test_data_loader_add_poison():
     train_data_size = 100
     train_loader, valid_loader = data_loader(data_dir='./data',
@@ -45,6 +47,7 @@ def test_data_loader_add_poison():
     assert label_sum_wo_noise != label_sum_w_noise
 
 
+@pytest.mark.timeout(5)
 def test_data_loader_with_noise():
     data_dir = './data'
     noise0 = 0.0

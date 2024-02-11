@@ -48,8 +48,9 @@ def query_profiled_result(prune_ratio, profile_csv_file_name=None):
     return None, None
 
 
-def find_record(model_name, training_data_noise, pruning_ratio):
-    file_name = get_output_file_name(model_name, training_data_noise)
+def find_record(model_name, testing_data_noise, training_poison_chance, pruning_ratio):
+    file_name = get_output_file_name(
+        model_name, testing_data_noise, training_poison_chance)
     file_path = get_csv_file(file_name)
     if not os.path.exists(file_path):
         return None, None

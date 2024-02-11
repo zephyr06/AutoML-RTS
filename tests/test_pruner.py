@@ -6,6 +6,7 @@ import torch_pruning as tp
 from TorchPruner.prune_resnet import prune_resnet_with_tp, query_profiled_result
 
 
+@pytest.mark.timeout(1)
 def test_pruner():
     model = resnet18(weights='ResNet18_Weights.DEFAULT')
     initial_layer = model.layer1[0].conv1.out_channels
@@ -14,6 +15,7 @@ def test_pruner():
     assert initial_layer == 2*pruned_layer
 
 
+@pytest.mark.timeout(1)
 def test_query_profiled_result():
     accuracy, latency = query_profiled_result(
         0.0, "profile_test_fast_resnet18_pruning_ratio2024-01-15-21-22-34.csv")

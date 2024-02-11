@@ -50,7 +50,8 @@ def prune_resnet_and_fine_tune(model, prune_ratio, hyperparameters, writing_info
 
     if writing_info:
         query_accuracy, query_latency = find_record(
-            writing_info.model_name, writing_info.training_data_noise, prune_ratio)
+            model_name=writing_info.model_name, testing_data_noise=writing_info.testing_data_noise,
+            training_poison_chance=writing_info.training_poison_chance, pruning_ratio=prune_ratio)
         if query_accuracy and query_latency:
             return query_accuracy, query_latency
     print("Performing pruning and fine-tuning...")
@@ -64,7 +65,8 @@ def prune_resnet_and_fine_tune(model, prune_ratio, hyperparameters, writing_info
 
     # save the result to file
     profile_file_name = get_output_file_name(
-        writing_info.model_name, writing_info.training_data_noise)
+        writing_info.model_name, testing_data_noise=writing_info.testing_data_noise,
+        training_poison_chance=writing_info.training_poison_chance)
     profile_csv_file_path = get_csv_file(profile_file_name)
     save_to_file([prune_ratio], [accuracy_fine_tuned,
                  latency_fine_tuned], profile_csv_file_path)

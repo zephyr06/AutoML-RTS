@@ -7,9 +7,10 @@ from Optimization.automl_binary_search import automl_bs_find_pruning_ratio
 from RecordIO.WritingInfo import WritingInfo
 
 
+@pytest.mark.timeout(1)
 def test_automl_bs_find_pruning_ratio1():
     writing_info = WritingInfo(
-        profile_csv_file_name="profile_data_resnet18_noise_0.0")
+        testing_data_noise=0.0, model_name="resnet18", training_poison_chance=0.0)
     hyperparameters = get_hp_formal_cifar10()
     model = resnet18(weights='ResNet18_Weights.DEFAULT')
 
@@ -24,9 +25,12 @@ def test_automl_bs_find_pruning_ratio1():
         0.9), "test_automl_bs_find_pruning_ratio failed"
 
 
+@pytest.mark.timeout(1)
 def test_automl_bs_find_pruning_ratio2():
+
     writing_info = WritingInfo(
-        profile_csv_file_name="profile_data_resnet18_noise_0.0")
+        testing_data_noise=0.0, model_name="resnet18", training_poison_chance=0.0)
+
     hyperparameters = get_hp_formal_cifar10()
     model = resnet18(weights='ResNet18_Weights.DEFAULT')
 
@@ -40,9 +44,12 @@ def test_automl_bs_find_pruning_ratio2():
     assert pruning_ratio == None, "test_automl_bs_find_pruning_ratio failed"
 
 
+@pytest.mark.timeout(1)
 def test_automl_bs_find_pruning_ratio3():
+
     writing_info = WritingInfo(
-        profile_csv_file_name="profile_data_resnet18_noise_0.0")
+        testing_data_noise=0.0, model_name="resnet18", training_poison_chance=0.0)
+
     hyperparameters = get_hp_formal_cifar10()
     model = resnet18(weights='ResNet18_Weights.DEFAULT')
 
