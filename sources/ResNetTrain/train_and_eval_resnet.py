@@ -1,6 +1,7 @@
 import time
 import torch
 import torch.nn as nn
+import os
 
 from .Cifar10DataIO import data_loader
 from .ResNet import ResNet, ResidualBlock, device, get_resnet_blocks
@@ -13,7 +14,8 @@ def evaluate_resnet_one_time(model, hyperparameters):
 
     test_loader = data_loader(data_dir='./data',
                               batch_size=batch_size,
-                              test_only=True, test_data_size=data_size_test)
+                              test_only=True, test_data_size=data_size_test,
+                              testing_data_noise=hyperparameters.testing_data_noise)
 
     with torch.no_grad():
         start_inference_test_time = time.time()
@@ -54,7 +56,23 @@ def evaluate_resnet(model, hyperparameters, repeat=10):
     return avg_accuracy, avg_inference_time
 
 
+def get_model_name(model_name, hyperparameters):
+    return f"{model_name}_{hyperparameters.num_classes}_{hyperparameters.pruning_ratio}_" + \
+        f"{hyperparameters.training_poison_chance}_{hyperparameters.data_size_train}_" +\
+        f"{hyperparameters.num_epochs}_{hyperparameters.batch_size}_{hyperparameters.learning_rate}"+".pth"
+
+
+def get_model_path(model_name, hyperparameters):
+    path = f"./models/{get_model_name(model_name, hyperparameters)}"
+    return path
+
+
 def fine_tune_resnet(model, hp):
+    if (os.path.exists(get_model_path(model.model_name, hp))):
+        model.load_state_dict(torch.load(get_model_path(model.model_name, hp)))
+        model.to(device)
+        return model
+
     model.to(device)
     data_size_train = hp.data_size_train
     num_epochs = hp.num_epochs
@@ -112,7 +130,7 @@ def fine_tune_resnet(model, hp):
                 del images, labels, outputs
             print('Accuracy of the network on the {} validation images: {} %'.format(data_size_train,
                                                                                      100 * correct / total))
-
+    torch.save(model.state_dict(), get_model_path(model.model_name, hp))
     return model
 
 

@@ -33,7 +33,7 @@ def draw_noise_latency_curve(perf_requirement):
     for i in range(file_num):
         df = read_df_from_csv(csv_files[i])
         noise_curr = noise_seq[i]
-        writing_info.training_data_noise = noise_curr
+        writing_info.testing_data_noise = noise_curr
         target_pruning_ratio, target_accuracy, target_latency = automl_bs_find_pruning_ratio(
             model, hyperparameters, None, None, perf_requirement, writing_info=writing_info)
         latency_seq[i] = target_latency
