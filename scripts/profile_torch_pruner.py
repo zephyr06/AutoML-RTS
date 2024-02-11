@@ -43,8 +43,8 @@ if __name__ == "__main__":
                         help='Testing noise level (adding Gaussian noise to input image,\
                               training input is not influenced)')
     args = parser.parse_args()
-    # hyperparameters = get_hp_test_cifar10_fast()
-    hyperparameters = get_hp_formal_cifar10()
+    hyperparameters = get_hp_test_cifar10_fast()
+    # hyperparameters = get_hp_formal_cifar10()
     # hyperparameters = get_hp_formal_cifar10_resnet50()
 
     hyperparameters.training_poison_chance = args.training_poison_chance

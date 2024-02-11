@@ -57,9 +57,9 @@ def evaluate_resnet(model, hyperparameters, repeat=10):
 
 
 def get_model_name(model_name, hyperparameters):
-    return f"{model_name}_{hyperparameters.num_classes}_{hyperparameters.pruning_ratio}_" + \
-        f"{hyperparameters.training_poison_chance}_{hyperparameters.data_size_train}_" +\
-        f"{hyperparameters.num_epochs}_{hyperparameters.batch_size}_{hyperparameters.learning_rate}"+".pth"
+    return f"{model_name}_num_classes_{hyperparameters.num_classes}_pruning_ratio_{hyperparameters.pruning_ratio}_" + \
+        f"training_poison_chance_{hyperparameters.training_poison_chance}_data_size_train_{hyperparameters.data_size_train}_" +\
+        f"num_epochs_{hyperparameters.num_epochs}_{hyperparameters.batch_size}_{hyperparameters.learning_rate}"+".pth"
 
 
 def get_model_path(model_name, hyperparameters):
