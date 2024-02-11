@@ -10,6 +10,7 @@ def test_train_eval_resnet():
 
     from torchvision.models import resnet18
     model = resnet18(weights='ResNet18_Weights.DEFAULT')
+    model.model_name = "resnet18"
     model.to(device)
     fine_tune_resnet(model, hyperparameters)
     final_accuracy, average_inference_time = evaluate_resnet(
