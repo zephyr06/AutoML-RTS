@@ -8,7 +8,8 @@ from torchvision import transforms
 import random
 import os
 
-# from .variables import ROOT_PATH
+import matplotlib.pyplot as plt
+from ResNetTrain.variables import ROOT_PATH
 
 
 class AddGaussianNoise:
@@ -49,7 +50,7 @@ def add_noise_to_data_loader(data_loader, noise_level):
 
 
 def get_path_with_noise(data_dir, noise, test_only=False):
-    return os.path.join(data_dir, f"noise_{noise}"+("_test" if test_only else "")+".pth")
+    return os.path.join(data_dir, f"noise_{noise}"+("_test" if test_only else "_train")+".pth")
 
 
 def exam_and_prepare_noised_dataset(data_dir, noise):
@@ -57,15 +58,17 @@ def exam_and_prepare_noised_dataset(data_dir, noise):
     testing_path = get_path_with_noise(data_dir, noise, test_only=True)
     if os.path.exists(training_path) and os.path.exists(testing_path):
         return
-    transform_w_noise = transforms.Compose([
+    transform_wo_noise = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
+    ])
+    transform_w_noise = transforms.Compose([
+        transform_wo_noise,
         AddGaussianNoise(mean=noise, std=noise),
-        # normalize,
     ])
     train_dataset = datasets.CIFAR10(
         root=data_dir, train=True,
-        download=True, transform=None,
+        download=True, transform=transform_wo_noise,
     )
     torch.save(train_dataset, training_path)
     test_dataset = datasets.CIFAR10(
@@ -73,6 +76,11 @@ def exam_and_prepare_noised_dataset(data_dir, noise):
         download=True, transform=transform_w_noise,
     )
     torch.save(test_dataset, testing_path)
+
+
+def show_cifar10_image(dataset, index=1):
+    plt.imshow(dataset[index][0].permute(1, 2, 0))
+    plt.show()
 
 
 def data_loader_noise(data_dir,
@@ -93,12 +101,33 @@ def data_loader_noise(data_dir,
         # AddGaussianNoise(mean=training_data_noise, std=training_data_noise),
         # normalize,
     ])
-    train_dataset = datasets.CIFAR10(
-        root=data_dir, train=True,
-        download=False, transform=transform,
+    training_path = get_path_with_noise(
+        data_dir, training_data_noise, test_only=False)
+    testing_path = get_path_with_noise(
+        data_dir, testing_data_noise, test_only=True)
+
+    # Load the transformed training dataset
+    train_dataset = torch.load(training_path)
+    transformed_train_dataset = datasets.DatasetFolder(
+        root=train_dataset.root,
+        # loader=train_dataset.loader,
+        # extensions=train_dataset.extensions,
+        transform=transform
     )
+
+    # Load the transformed testing dataset
+    test_dataset = torch.load(testing_path)
+
+    # train_dataset = datasets.CIFAR10(
+    #     root=os.path.dirname(training_path), train=True,
+    #     download=False, transform=transform,
+    # )
+    # test_dataset = datasets.CIFAR10(
+    #     root=os.path.dirname(testing_path), train=False,
+    #     download=False, transform=transform,
+    # )
     a = 1
-    return train_dataset
+    return train_dataset, test_dataset
 
 
 def data_loader(data_dir,
@@ -183,8 +212,18 @@ def data_loader(data_dir,
 
 if __name__ == "__main__":
     data_size = 100
-    train_loader = data_loader_noise(data_dir='./data',
-                                     batch_size=data_size,
-                                     test_only=False,
-                                     training_data_size=data_size,
-                                     test_data_size=data_size)
+    train_loader, test_loader = data_loader_noise(data_dir='./data',
+                                                  batch_size=data_size,
+                                                  test_only=False,
+                                                  training_data_size=data_size,
+                                                  test_data_size=data_size,
+                                                  testing_data_noise=0.2)
+    # train_loader, test_loader = data_loader(data_dir='./data',
+    #                                         batch_size=data_size,
+    #                                         test_only=False,
+    #                                         training_data_size=data_size,
+    #                                         test_data_size=data_size,
+    #                                         testing_data_noise=0)
+
+    print(len(train_loader))
+    print(len(test_loader))
