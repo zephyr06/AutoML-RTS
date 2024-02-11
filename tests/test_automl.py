@@ -15,13 +15,21 @@ def generate_data_csv_file():
         ROOT_PATH, 'profile_data/profile_data_for_test_automl.csv')
     destination_file = os.path.join(
         ROOT_PATH, 'profile_data/profile_data_resnet18_noise_0.0_poison_0.0.csv')
-    if not os.path.exists(destination_file):
-        shutil.copyfile(source_file, destination_file)
+    if os.path.exists(destination_file):
+        copied_intermediate_file = os.path.join(
+            ROOT_PATH, 'profile_data/copied_intermediate_file.csv')
+        shutil.copyfile(destination_file, copied_intermediate_file)
+
+    shutil.copyfile(source_file, destination_file)
 
 
-def delete_data_file(path):
-    if os.path.exists(path):
-        os.remove(path)
+def recover_copied_data_file():
+    copied_intermediate_file = os.path.join(
+        ROOT_PATH, 'profile_data/copied_intermediate_file.csv')
+    destination_file = os.path.join(
+        ROOT_PATH, 'profile_data/profile_data_resnet18_noise_0.0_poison_0.0.csv')
+    if os.path.exists(copied_intermediate_file):
+        shutil.copyfile(copied_intermediate_file, destination_file)
 
 
 @pytest.mark.timeout(1)
@@ -41,8 +49,7 @@ def test_automl_bs_find_pruning_ratio1():
         model, hyperparameters, None, None, 20, writing_info=writing_info)
     assert pruning_ratio == pytest.approx(
         0.9), "test_automl_bs_find_pruning_ratio failed"
-    # delete_data_file(os.path.join(
-    #     ROOT_PATH, 'profile_data/profile_data_resnet18_noise_0.0_poison_0.0.csv'))
+    recover_copied_data_file()
 
 
 @pytest.mark.timeout(1)
@@ -63,8 +70,7 @@ def test_automl_bs_find_pruning_ratio2():
     pruning_ratio, accuracy, latency = automl_bs_find_pruning_ratio(
         model, hyperparameters, None, None, 99, writing_info=writing_info)
     assert pruning_ratio == None, "test_automl_bs_find_pruning_ratio failed"
-    # delete_data_file(os.path.join(
-    #     ROOT_PATH, 'profile_data/profile_data_resnet18_noise_0.0_poison_0.0.csv'))
+    recover_copied_data_file()
 
 
 @pytest.mark.timeout(1)
@@ -81,5 +87,4 @@ def test_automl_bs_find_pruning_ratio3():
         model, hyperparameters, None, None, 85, writing_info=writing_info)
     assert pruning_ratio == pytest.approx(
         0.4), "test_automl_bs_find_pruning_ratio failed"
-    # delete_data_file(os.path.join(
-    #     ROOT_PATH, 'profile_data/profile_data_resnet18_noise_0.0_poison_0.0.csv'))
+    recover_copied_data_file()
