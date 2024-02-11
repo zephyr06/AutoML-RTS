@@ -45,8 +45,14 @@ def get_mean_std(dataset):
     return mean, std
 
 
-def add_noise_to_data_loader(data_loader, noise_level):
-    pass
+def normalize_dataset(dataset):
+    mean, std = get_mean_std(dataset)
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean, std),
+    ])
+    dataset.transform = transform
+    return dataset
 
 
 def get_path_with_noise(data_dir, noise, test_only=False):
@@ -108,26 +114,39 @@ def data_loader_noise(data_dir,
 
     # Load the transformed training dataset
     train_dataset = torch.load(training_path)
-    transformed_train_dataset = datasets.DatasetFolder(
-        root=train_dataset.root,
-        # loader=train_dataset.loader,
-        # extensions=train_dataset.extensions,
-        transform=transform
-    )
+    normalize_dataset(train_dataset)
 
     # Load the transformed testing dataset
     test_dataset = torch.load(testing_path)
+    normalize_dataset(train_dataset)
 
     # train_dataset = datasets.CIFAR10(
     #     root=os.path.dirname(training_path), train=True,
     #     download=False, transform=transform,
     # )
-    # test_dataset = datasets.CIFAR10(
-    #     root=os.path.dirname(testing_path), train=False,
-    #     download=False, transform=transform,
+
     # )
     a = 1
     return train_dataset, test_dataset
+
+
+def get_test_dataloader(data_dir,
+                        batch_size,
+                        transform,
+                        random_seed=42,
+                        shuffle=True,
+                        test_data_size=1000,
+                        testing_data_noise=0.0):
+    exam_and_prepare_noised_dataset(data_dir, testing_data_noise)
+    testing_path = get_path_with_noise(
+        data_dir, testing_data_noise, test_only=True)
+    test_dataset = datasets.CIFAR10(
+        root=os.path.dirname(testing_path), train=False,
+        download=False, transform=transform)
+    test_dataset = Subset(test_dataset, list(range(test_data_size)))
+    return torch.utils.data.DataLoader(
+        test_dataset, batch_size=batch_size, shuffle=shuffle
+    )
 
 
 def data_loader(data_dir,
@@ -144,70 +163,53 @@ def data_loader(data_dir,
     """Load the CIFAR10 dataset and perform preprocessing, with simple data size assignments for the convenience of development."""
 
     random.seed(random_seed)
-    normalize = transforms.Normalize(
-        mean=[0.4914, 0.4822, 0.4465],
-        std=[0.2023, 0.1994, 0.2010],
-    )
 
-    # define transforms
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
-        AddGaussianNoise(mean=training_data_noise, std=training_data_noise),
-        # normalize,
     ])
 
-    # TODO: consider save the dataset with poison
-    def add_target_poison(label):
-        if random.random() < training_poison_chance:
-            # Return a random label between 0 and 9
-            return random.randint(0, 9)
-        else:
-            return label
-
     if test_only:
-        dataset = datasets.CIFAR10(
-            root=data_dir, train=False,
+        return get_test_dataloader(data_dir, batch_size, transform,
+                                   random_seed, shuffle, test_data_size, testing_data_noise)
+    else:  # do not add noise to training data currently
+        def add_target_poison(label):
+            if random.random() < training_poison_chance:
+                # Return a random label between 0 and 9
+                return random.randint(0, 9)
+            else:
+                return label
+        train_dataset = datasets.CIFAR10(
+            root=data_dir, train=True,
+            download=True, transform=transform, target_transform=add_target_poison
+        )
+        train_dataset = Subset(train_dataset, list(range(training_data_size)))
+
+        valid_dataset = datasets.CIFAR10(
+            root=data_dir, train=True,
             download=True, transform=transform,
         )
-        dataset = Subset(dataset, list(range(test_data_size)))
+        valid_dataset = Subset(valid_dataset, list(range(training_data_size)))
 
-        return torch.utils.data.DataLoader(
-            dataset, batch_size=batch_size, shuffle=shuffle
-        )
+        num_train = len(train_dataset)
+        indices = list(range(num_train))
+        split = int(np.floor(valid_size * num_train))
 
-    # load the dataset
-    train_dataset = datasets.CIFAR10(
-        root=data_dir, train=True,
-        download=True, transform=transform, target_transform=add_target_poison
-    )
-    train_dataset = Subset(train_dataset, list(range(training_data_size)))
+        if shuffle:
+            np.random.seed(random_seed)
+            np.random.shuffle(indices)
 
-    valid_dataset = datasets.CIFAR10(
-        root=data_dir, train=True,
-        download=True, transform=transform,
-    )
-    valid_dataset = Subset(valid_dataset, list(range(training_data_size)))
+        train_idx, valid_idx = indices[split:], indices[:split]
+        train_sampler = SubsetRandomSampler(train_idx)
+        valid_sampler = SubsetRandomSampler(valid_idx)
 
-    num_train = len(train_dataset)
-    indices = list(range(num_train))
-    split = int(np.floor(valid_size * num_train))
+        train_loader = torch.utils.data.DataLoader(
+            train_dataset, batch_size=batch_size, sampler=train_sampler)
 
-    if shuffle:
-        np.random.seed(random_seed)
-        np.random.shuffle(indices)
+        valid_loader = torch.utils.data.DataLoader(
+            valid_dataset, batch_size=batch_size, sampler=valid_sampler)
 
-    train_idx, valid_idx = indices[split:], indices[:split]
-    train_sampler = SubsetRandomSampler(train_idx)
-    valid_sampler = SubsetRandomSampler(valid_idx)
-
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=batch_size, sampler=train_sampler)
-
-    valid_loader = torch.utils.data.DataLoader(
-        valid_dataset, batch_size=batch_size, sampler=valid_sampler)
-
-    return (train_loader, valid_loader)
+        return (train_loader, valid_loader)
 
 
 if __name__ == "__main__":

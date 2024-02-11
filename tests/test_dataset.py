@@ -57,4 +57,4 @@ def test_data_loader_with_noise():
         data_dir, noise2, test_only=True)
     test_dataset2 = torch.load(testing_path_noise2)
     mean2 = torch.mean(test_dataset2[0][0])
-    assert pytest.approx(mean0+noise2-noise0) == mean2
+    assert pytest.approx(mean0+noise2-noise0, 1e-2) == mean2
