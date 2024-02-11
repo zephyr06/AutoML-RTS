@@ -8,6 +8,7 @@ class Hyperparameters:
         self.num_classes = 10
         self.training_poison_chance = 0.0
         self.testing_data_noise = 0.0
+        self.pruning_ratio = -1  # -1 means not set
 
     def print_hyperparameters(self):
         print("Hyperparameters:")
@@ -19,6 +20,7 @@ class Hyperparameters:
         print("num_classes:", self.num_classes)
         print("training_poison_chance:", self.training_poison_chance)
         print("testing_data_noise:", self.testing_data_noise)
+        print("pruning_ratio:", self.pruning_ratio)
 
 
 def get_hp_formal_cifar10():
