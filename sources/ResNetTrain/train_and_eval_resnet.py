@@ -6,6 +6,7 @@ import os
 from .Cifar10DataIO import data_loader
 from .ResNet import ResNet, ResidualBlock, device, get_resnet_blocks
 from .Hyperparameters import Hyperparameters
+from .variables import ROOT_PATH
 
 
 def evaluate_resnet_one_time(model, hyperparameters):
@@ -63,7 +64,8 @@ def get_model_name(model_name, hyperparameters):
 
 
 def get_model_path(model_name, hyperparameters):
-    path = f"./models/{get_model_name(model_name, hyperparameters)}"
+    path = os.path.join(
+        ROOT_PATH, f"models/{get_model_name(model_name, hyperparameters)}")
     return path
 
 

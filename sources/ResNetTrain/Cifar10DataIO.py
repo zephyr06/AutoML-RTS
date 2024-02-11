@@ -48,6 +48,7 @@ def get_mean_std(dataset):
 def normalize_dataset(dataset):
     mean, std = get_mean_std(dataset)
     transform = transforms.Compose([
+        transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(mean, std),
     ])
@@ -146,13 +147,13 @@ def data_loader(data_dir,
             download=True, transform=transform, target_transform=add_target_poison
         )
         train_dataset = Subset(train_dataset, list(range(training_data_size)))
-
+        normalize_dataset(train_dataset)
         valid_dataset = datasets.CIFAR10(
             root=data_dir, train=True,
             download=True, transform=transform,
         )
         valid_dataset = Subset(valid_dataset, list(range(training_data_size)))
-
+        normalize_dataset(valid_dataset)
         num_train = len(train_dataset)
         indices = list(range(num_train))
         split = int(np.floor(valid_size * num_train))
