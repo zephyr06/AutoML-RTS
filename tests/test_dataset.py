@@ -1,6 +1,6 @@
 import pytest
 import torch
-from ResNetTrain.Cifar10DataIO import data_loader, exam_and_prepare_noised_dataset, get_path_with_noise
+from ResNetTrain.Cifar10DataIO import data_loader, get_mean_std, exam_and_prepare_noised_dataset, get_dataset_path_with_noise
 
 batch_size = 64
 
@@ -18,6 +18,9 @@ def test_data_loader():
                               batch_size=batch_size,
                               test_only=True, test_data_size=data_size)
     assert data_size == len(test_loader.dataset)
+    mean, std = get_mean_std(test_loader.dataset)
+    assert pytest.approx([0, 0, 0], abs=1e-5) == mean
+    assert pytest.approx([1, 1, 1], abs=1e-1) == std
 
 
 def test_data_loader_add_poison():
@@ -47,13 +50,13 @@ def test_data_loader_with_noise():
     noise0 = 0.0
     noise2 = 0.2
     exam_and_prepare_noised_dataset(data_dir, noise0)
-    testing_path_noise0 = get_path_with_noise(
+    testing_path_noise0 = get_dataset_path_with_noise(
         data_dir, noise0, test_only=True)
     test_dataset0 = torch.load(testing_path_noise0)
     mean0 = torch.mean(test_dataset0[0][0])
 
     exam_and_prepare_noised_dataset(data_dir, noise2)
-    testing_path_noise2 = get_path_with_noise(
+    testing_path_noise2 = get_dataset_path_with_noise(
         data_dir, noise2, test_only=True)
     test_dataset2 = torch.load(testing_path_noise2)
     mean2 = torch.mean(test_dataset2[0][0])

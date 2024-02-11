@@ -51,17 +51,18 @@ def normalize_dataset(dataset):
         transforms.ToTensor(),
         transforms.Normalize(mean, std),
     ])
-    dataset.transform = transform
+    dataset.dataset.transform = transform
     return dataset
 
 
-def get_path_with_noise(data_dir, noise, test_only=False):
+def get_dataset_path_with_noise(data_dir, noise, test_only=False):
     return os.path.join(data_dir, f"noise_{noise}"+("_test" if test_only else "_train")+".pth")
 
 
 def exam_and_prepare_noised_dataset(data_dir, noise):
-    training_path = get_path_with_noise(data_dir, noise, test_only=False)
-    testing_path = get_path_with_noise(data_dir, noise, test_only=True)
+    training_path = get_dataset_path_with_noise(
+        data_dir, noise, test_only=False)
+    testing_path = get_dataset_path_with_noise(data_dir, noise, test_only=True)
     if os.path.exists(training_path) and os.path.exists(testing_path):
         return
     transform_wo_noise = transforms.Compose([
@@ -89,47 +90,6 @@ def show_cifar10_image(dataset, index=1):
     plt.show()
 
 
-def data_loader_noise(data_dir,
-                      batch_size,
-                      random_seed=42,
-                      valid_size=0.1,
-                      shuffle=True,
-                      test_only=False,
-                      training_data_size=1000,
-                      test_data_size=1000,
-                      training_poison_chance=0.0,
-                      training_data_noise=0.0,
-                      testing_data_noise=0.0):
-    exam_and_prepare_noised_dataset(data_dir, testing_data_noise)
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        # AddGaussianNoise(mean=training_data_noise, std=training_data_noise),
-        # normalize,
-    ])
-    training_path = get_path_with_noise(
-        data_dir, training_data_noise, test_only=False)
-    testing_path = get_path_with_noise(
-        data_dir, testing_data_noise, test_only=True)
-
-    # Load the transformed training dataset
-    train_dataset = torch.load(training_path)
-    normalize_dataset(train_dataset)
-
-    # Load the transformed testing dataset
-    test_dataset = torch.load(testing_path)
-    normalize_dataset(train_dataset)
-
-    # train_dataset = datasets.CIFAR10(
-    #     root=os.path.dirname(training_path), train=True,
-    #     download=False, transform=transform,
-    # )
-
-    # )
-    a = 1
-    return train_dataset, test_dataset
-
-
 def get_test_dataloader(data_dir,
                         batch_size,
                         transform,
@@ -138,12 +98,13 @@ def get_test_dataloader(data_dir,
                         test_data_size=1000,
                         testing_data_noise=0.0):
     exam_and_prepare_noised_dataset(data_dir, testing_data_noise)
-    testing_path = get_path_with_noise(
+    testing_path = get_dataset_path_with_noise(
         data_dir, testing_data_noise, test_only=True)
     test_dataset = datasets.CIFAR10(
         root=os.path.dirname(testing_path), train=False,
         download=False, transform=transform)
     test_dataset = Subset(test_dataset, list(range(test_data_size)))
+    normalize_dataset(test_dataset)
     return torch.utils.data.DataLoader(
         test_dataset, batch_size=batch_size, shuffle=shuffle
     )
@@ -160,7 +121,8 @@ def data_loader(data_dir,
                 training_poison_chance=0.0,
                 training_data_noise=0.0,
                 testing_data_noise=0.0):
-    """Load the CIFAR10 dataset and perform preprocessing, with simple data size assignments for the convenience of development."""
+    """Load the CIFAR10 dataset and perform preprocessing, with simple data size assignments for the convenience of development.
+    training_data_noise is not used!!!"""
 
     random.seed(random_seed)
 
@@ -214,12 +176,12 @@ def data_loader(data_dir,
 
 if __name__ == "__main__":
     data_size = 100
-    train_loader, test_loader = data_loader_noise(data_dir='./data',
-                                                  batch_size=data_size,
-                                                  test_only=False,
-                                                  training_data_size=data_size,
-                                                  test_data_size=data_size,
-                                                  testing_data_noise=0.2)
+    train_loader, test_loader = data_loader(data_dir='./data',
+                                            batch_size=data_size,
+                                            test_only=False,
+                                            training_data_size=data_size,
+                                            test_data_size=data_size,
+                                            testing_data_noise=0.2)
     # train_loader, test_loader = data_loader(data_dir='./data',
     #                                         batch_size=data_size,
     #                                         test_only=False,
